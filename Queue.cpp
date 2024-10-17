@@ -87,6 +87,8 @@ int main() {
             case 2:
                 if (!isEmpty(&q)) {
                     printf("Dequeued value: %d\n", dequeue(&q));
+                } else {
+                    printf("Queue is empty!\n");
                 }
                 break;
             case 3:
