@@ -6,71 +6,77 @@ typedef struct {
     int arr[MAX_SIZE];
     int front;
     int rear;
-} Queue;
+} CircularQueue;
 
-// Initialize the queue
-void initialize(Queue *q) {
+// Initialize the circular queue
+void initialize(CircularQueue *q) {
     q->front = -1;
     q->rear = -1;
 }
 
 // Check if the queue is empty
-int isEmpty(Queue *q) {
+int isEmpty(CircularQueue *q) {
     return q->front == -1;
 }
 
 // Check if the queue is full
-int isFull(Queue *q) {
-    return q->rear == MAX_SIZE - 1;
+int isFull(CircularQueue *q) {
+    return (q->rear + 1) % MAX_SIZE == q->front;
 }
 
 // Enqueue an item to the queue
-void enqueue(Queue *q, int item) {
+void enqueue(CircularQueue *q, int item) {
     if (isFull(q)) {
         printf("Queue is full!\n");
         return;
     }
     if (isEmpty(q)) {
         q->front = 0;
+        q->rear = 0;
+    } else {
+        q->rear = (q->rear + 1) % MAX_SIZE;
     }
-    q->arr[++(q->rear)] = item;
+    q->arr[q->rear] = item;
+    printf("%d enqueued to the queue.\n", item);
 }
 
 // Dequeue an item from the queue
-int dequeue(Queue *q) {
+int dequeue(CircularQueue *q) {
     if (isEmpty(q)) {
         printf("Queue is empty!\n");
-        exit(1);
+        return -1;
     }
     int dequeuedItem = q->arr[q->front];
     if (q->front == q->rear) {
         q->front = -1;
         q->rear = -1;
     } else {
-        q->front++;
+        q->front = (q->front + 1) % MAX_SIZE;
     }
     return dequeuedItem;
 }
 
 // Display all elements in the queue
-void display(Queue *q) {
+void display(CircularQueue *q) {
     if (isEmpty(q)) {
         printf("Queue is empty!\n");
         return;
     }
-    printf("Queue elements are:\n");
-    for (int i = q->front; i <= q->rear; i++) {
+    printf("Queue elements: ");
+    int i = q->front;
+    while (i != q->rear) {
         printf("%d ", q->arr[i]);
+        i = (i + 1) % MAX_SIZE;
     }
-    printf("\n");
+    printf("%d\n", q->arr[q->rear]);
 }
 
 int main() {
-    Queue q;
-    int choice, value;
+    CircularQueue q;
     initialize(&q);
+    int choice, item;
     while (1) {
-        printf("\nChoose an operation:\n");
+        printf("\nQueue Menu:\n");
         printf("1. Enqueue\n");
         printf("2. Dequeue\n");
         printf("3. Display\n");
@@ -79,27 +85,22 @@ int main() {
         scanf("%d", &choice);
         switch (choice) {
             case 1:
-                printf("Enter a value to enqueue: ");
-                scanf("%d", &value);
-                enqueue(&q, value);
-                printf("Enqueued %d into the queue.\n", value);
+                printf("Enter the element to enqueue: ");
+                scanf("%d", &item);
+                enqueue(&q, item);
                 break;
             case 2:
-                if (!isEmpty(&q)) {
-                    printf("Dequeued value: %d\n", dequeue(&q));
-                } else {
-                    printf("Queue is empty!\n");
-                }
+                item = dequeue(&q);
+                if (item != -1)
+                    printf("Dequeued element: %d\n", item);
                 break;
             case 3:
                 display(&q);
                 break;
             case 4:
-                printf("Exiting...\n");
                 exit(0);
-                break;
             default:
-                printf("Invalid choice! Please choose again.\n");
+                printf("Invalid choice, please try again.\n");
         }
     }
     return 0;
